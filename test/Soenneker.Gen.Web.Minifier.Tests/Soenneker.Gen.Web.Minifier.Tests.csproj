@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Soenneker.Tests.Unit" Version="4.0.1362" />
+        <PackageReference Include="TUnit" Version="1.73.19" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Soenneker.Gen.Web.Minifier\Soenneker.Gen.Web.Minifier.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+        <ProjectReference Include="..\..\src\Soenneker.Gen.Web.Minifier.BuildTasks\Soenneker.Gen.Web.Minifier.BuildTasks.csproj" />
+    </ItemGroup>
+
+</Project>

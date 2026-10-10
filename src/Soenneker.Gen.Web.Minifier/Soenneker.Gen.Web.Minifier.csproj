@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <Platforms>AnyCPU</Platforms>
+        <NoWarn>$(NoWarn);1591;</NoWarn>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <DevelopmentDependency>true</DevelopmentDependency>
+        <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);AddBuildTasksOutputToPackage</TargetsForTfmSpecificContentInPackage>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Description>An external generator for minifying web assets</Description>
+        <Version Condition="'$(BUILD_VERSION)' == ''">4.0.0</Version>
+        <Version Condition="'$(BUILD_VERSION)' != ''">$(BUILD_VERSION)</Version>
+        <AssemblyName>Soenneker.Gen.Web.Minifier</AssemblyName>
+        <PackageId>Soenneker.Gen.Web.Minifier</PackageId>
+        <PackageTags>gen web minifier minify generator external javascript css webminifier externalgenerator csharp dotnet c# .net</PackageTags>
+        <Copyright>Copyright © 2026 Jake Soenneker</Copyright>
+        <Authors>Jake Soenneker</Authors>
+        <Company>https://soenneker.com</Company>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <IsPackable>true</IsPackable>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/soenneker/soenneker.gen.web.minifier</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/soenneker/soenneker.gen.web.minifier</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryBranch>main</RepositoryBranch>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>icon.png</PackageIcon>
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+        <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+        <None Include="..\..\icon.png" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="Soenneker.Gen.Web.Minifier.targets" Pack="true" PackagePath="build\" />
+        <None Include="Soenneker.Gen.Web.Minifier.targets" Pack="true" PackagePath="buildTransitive\" />
+
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="$(TargetPath)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+        <None Include="$(TargetDir)$(AssemblyName).pdb" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" Condition="Exists('$(TargetDir)$(AssemblyName).pdb')" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" PrivateAssets="all" />
+    </ItemGroup>
+
+    <Target Name="BuildBuildTasksTool" BeforeTargets="Pack" Condition="'$(IsPackable)' == 'true'">
+
+        <MSBuild Projects="..\Soenneker.Gen.Web.Minifier.BuildTasks\Soenneker.Gen.Web.Minifier.BuildTasks.csproj" Targets="Build" Properties="Configuration=$(Configuration);NoBuild=false" RemoveProperties="TargetFramework;TargetFrameworks" BuildInParallel="true" />
+
+        <Error Condition="!Exists('..\Soenneker.Gen.Web.Minifier.BuildTasks\bin\$(Configuration)\Soenneker.Gen.Web.Minifier.BuildTasks.dll')" Text="BuildTasks output missing. Aborting pack to avoid publishing a broken package." />
+    </Target>
+    <Target Name="AddBuildTasksOutputToPackage" DependsOnTargets="BuildBuildTasksTool">
+        <ItemGroup>
+            <TfmSpecificPackageFile Include="..\Soenneker.Gen.Web.Minifier.BuildTasks\bin\$(Configuration)\**\*.*" PackagePath="buildTransitive/%(RecursiveDir)" />
+        </ItemGroup>
+    </Target>
+</Project>

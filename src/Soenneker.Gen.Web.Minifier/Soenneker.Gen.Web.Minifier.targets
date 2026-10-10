@@ -1,0 +1,40 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <WebMinifierBuildTasksDllPath Condition="'$(WebMinifierBuildTasksDllPath)'==''">$(MSBuildThisFileDirectory)..\buildTransitive\Soenneker.Gen.Web.Minifier.BuildTasks.dll</WebMinifierBuildTasksDllPath>
+        <WebMinifierBuildEnabled Condition="'$(WebMinifierBuildEnabled)'==''">true</WebMinifierBuildEnabled>
+        <WebMinifierCssEnabled Condition="'$(WebMinifierCssEnabled)'==''">true</WebMinifierCssEnabled>
+        <WebMinifierJsEnabled Condition="'$(WebMinifierJsEnabled)'==''">true</WebMinifierJsEnabled>
+        <WebMinifierRecursive Condition="'$(WebMinifierRecursive)'==''">true</WebMinifierRecursive>
+        <WebMinifierFolders Condition="'$(WebMinifierFolders)'==''">wwwroot</WebMinifierFolders>
+    </PropertyGroup>
+
+    <!-- Folders are semicolon-separated. Exclusions are directory names anywhere in
+         the tree, or paths relative to the project. bin, obj, node_modules and .git
+         are always excluded. Missing scan folders are allowed. -->
+    <Target Name="RunWebMinifierBuildTasks" BeforeTargets="PrepareForBuild;ComputeFilesToPublish"
+            Condition="'$(DesignTimeBuild)'!='true' and '$(IsCrossTargetingBuild)'!='true' and '$(WebMinifierBuildEnabled)'=='true'">
+        <Error Condition="!Exists('$(WebMinifierBuildTasksDllPath)')" Text="WebMinifier tool not found: $(WebMinifierBuildTasksDllPath)" />
+        <PropertyGroup>
+            <_WebMinifierOptions>$(IntermediateOutputPath)Soenneker.Gen.Web.Minifier.options</_WebMinifierOptions>
+            <_WebMinifierOutputs>$(IntermediateOutputPath)Soenneker.Gen.Web.Minifier.outputs</_WebMinifierOutputs>
+        </PropertyGroup>
+        <ItemGroup>
+            <_WebMinifierFolders Include="$(WebMinifierFolders)" />
+            <_WebMinifierExclusions Include="$(WebMinifierExcludeFolders)" />
+        </ItemGroup>
+        <MakeDir Directories="$(IntermediateOutputPath)" />
+        <WriteLinesToFile File="$(_WebMinifierOptions)" Overwrite="true" WriteOnlyWhenDifferent="true"
+                          Lines="cssEnabled=$(WebMinifierCssEnabled);jsEnabled=$(WebMinifierJsEnabled);recursive=$(WebMinifierRecursive);@(_WebMinifierFolders->'folder=%(Identity)');@(_WebMinifierExclusions->'excludeFolder=%(Identity)')" />
+        <Exec WorkingDirectory="$(MSBuildProjectDirectory)"
+              Command="dotnet exec &quot;$(WebMinifierBuildTasksDllPath)&quot; --projectDir &quot;$(MSBuildProjectDirectory)&quot; --options &quot;$(_WebMinifierOptions)&quot; --outputs &quot;$(_WebMinifierOutputs)&quot;" />
+        <ReadLinesFromFile File="$(_WebMinifierOutputs)">
+            <Output TaskParameter="Lines" ItemName="_WebMinifierGeneratedPaths" />
+        </ReadLinesFromFile>
+        <ItemGroup>
+            <!-- Relative identities match SDK globs, including static web assets. -->
+            <_WebMinifierGenerated Include="@(_WebMinifierGeneratedPaths)" />
+            <Content Include="@(_WebMinifierGenerated)" Exclude="@(Content)" CopyToPublishDirectory="PreserveNewest" />
+            <FileWrites Include="$(_WebMinifierOptions);$(_WebMinifierOutputs)" />
+        </ItemGroup>
+    </Target>
+</Project>

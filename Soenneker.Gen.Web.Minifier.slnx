@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/.github/">
+    <File Path=".github/renovate.json" />
+  </Folder>
+  <Folder Name="/.github/workflows/">
+    <File Path=".github/workflows/build-and-test.yml" />
+    <File Path=".github/workflows/codeql.yml" />
+    <File Path=".github/workflows/publish-package.yml" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Soenneker.Gen.Web.Minifier/Soenneker.Gen.Web.Minifier.csproj" />
+    <Project Path="src/Soenneker.Gen.Web.Minifier.BuildTasks/Soenneker.Gen.Web.Minifier.BuildTasks.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/Soenneker.Gen.Web.Minifier.Tests/Soenneker.Gen.Web.Minifier.Tests.csproj" />
+  </Folder>
+</Solution>
