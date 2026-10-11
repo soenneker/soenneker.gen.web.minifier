@@ -34,7 +34,7 @@
             <!-- Relative identities match SDK globs, including static web assets. -->
             <_WebMinifierGenerated Include="@(_WebMinifierGeneratedPaths)" />
             <Content Include="@(_WebMinifierGenerated)" Exclude="@(Content)" CopyToPublishDirectory="PreserveNewest" />
-            <FileWrites Include="$(_WebMinifierOptions);$(_WebMinifierOutputs)" />
+            <FileWrites Include="$(_WebMinifierOptions);$(_WebMinifierOutputs);$(_WebMinifierOutputs).cache" />
         </ItemGroup>
     </Target>
 </Project>

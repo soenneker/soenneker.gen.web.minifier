@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Soenneker.Css.Minify.Abstract;
@@ -12,6 +15,8 @@ using Soenneker.Gen.Web.Minifier.BuildTasks.Dtos;
 using Soenneker.JavaScript.Minifier.Abstract;
 using Soenneker.Utils.File.Abstract;
 using Soenneker.Utils.Directory.Abstract;
+using Soenneker.Utils.Json;
+using Soenneker.Utils.Runtime;
 
 namespace Soenneker.Gen.Web.Minifier.BuildTasks;
 
@@ -22,7 +27,7 @@ public sealed class WebMinifierWriteRunner(
     IDirectoryUtil directoryUtil) : IWebMinifierWriteRunner
 {
     private static readonly StringComparer _pathComparer =
-        OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+        RuntimeUtil.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
 
     public async ValueTask<int> Run(string[] args, CancellationToken cancellationToken)
     {
@@ -82,6 +87,30 @@ public sealed class WebMinifierWriteRunner(
             if (options.Folders.Count == 0)
                 options.Folders.Add("wwwroot");
 
+            string cachePath = arguments.TryGetValue("--outputs", out string? manifestPath)
+                ? Path.GetFullPath(manifestPath, projectDir) + ".cache"
+                : Path.Combine(projectDir, "obj", "Soenneker.Gen.Web.Minifier.cache");
+            var cache = new Dictionary<string, string>(_pathComparer);
+            try
+            {
+                if (await fileUtil.Exists(cachePath, cancellationToken).NoSync())
+                    cache = new Dictionary<string, string>(
+                        JsonUtil.Deserialize<Dictionary<string, string>>(await fileUtil.Read(cachePath, log: false, cancellationToken: cancellationToken).NoSync())
+                        ?? new Dictionary<string, string>(), _pathComparer);
+            }
+            catch (JsonException) { /* An invalid cache is rebuilt. */ }
+            catch (IOException) { /* An unavailable cache is rebuilt. */ }
+
+            // The build ID covers our code; the dependency manifest covers package/tool updates.
+            string depsPath = Path.ChangeExtension(typeof(WebMinifierWriteRunner).Assembly.Location, ".deps.json");
+            string toolHash = Hash(typeof(WebMinifierWriteRunner).Module.ModuleVersionId + "\n" +
+                                   cssMinifier.GetType().Module.ModuleVersionId + "\n" +
+                                   javaScriptMinifier.GetType().Module.ModuleVersionId + "\n" +
+                                   (await fileUtil.Exists(depsPath, cancellationToken).NoSync()
+                                       ? await fileUtil.Read(depsPath, log: false, cancellationToken: cancellationToken).NoSync()
+                                       : ""));
+            var updatedCache = new Dictionary<string, string>(_pathComparer);
+            int skipped = 0;
             var outputs = new List<string>();
             var visited = new HashSet<string>(_pathComparer);
             foreach (string folder in options.Folders)
@@ -99,14 +128,24 @@ public sealed class WebMinifierWriteRunner(
                         throw new IOException($"Refusing to overwrite a linked output: {output}");
                     string source = await fileUtil.Read(input, log: false, cancellationToken: cancellationToken)
                                                   .NoSync();
+                    string? existing = await fileUtil.Exists(output, cancellationToken).NoSync()
+                        ? await fileUtil.Read(output, log: false, cancellationToken: cancellationToken).NoSync()
+                        : null;
+                    string inputHash = toolHash + Hash(source);
+                    if (existing is not null && cache.TryGetValue(input, out string? cached) && cached == inputHash + Hash(existing))
+                    {
+                        updatedCache[input] = cached;
+                        outputs.Add(Path.GetRelativePath(projectDir, output));
+                        skipped++;
+                        continue;
+                    }
                     string minified = extension == ".css"
                         ? await cssMinifier.Minify(source, cancellationToken).NoSync()
                         : await javaScriptMinifier.Minify(source, cancellationToken).NoSync();
-                    if (!await fileUtil.Exists(output, cancellationToken).NoSync() ||
-                        await fileUtil.Read(output, log: false, cancellationToken: cancellationToken).NoSync() !=
-                        minified)
+                    if (existing != minified)
                         await fileUtil.Write(output, minified, log: false, cancellationToken: cancellationToken)
                                       .NoSync();
+                    updatedCache[input] = inputHash + Hash(minified);
                     outputs.Add(Path.GetRelativePath(projectDir, output));
                 }
             }
@@ -120,7 +159,12 @@ public sealed class WebMinifierWriteRunner(
                               .NoSync();
             }
 
-            Console.WriteLine($"WebMinifier: processed {outputs.Count} asset(s).");
+            await directoryUtil.Create(Path.GetDirectoryName(cachePath)!, log: false,
+                cancellationToken: cancellationToken).NoSync();
+            string cacheJson = JsonUtil.Serialize(updatedCache) ?? throw new InvalidOperationException("Failed to serialize the minifier cache.");
+            await fileUtil.WriteAtomically(cachePath, cacheJson, log: false, cancellationToken: cancellationToken).NoSync();
+
+            Console.WriteLine($"WebMinifier: minified {outputs.Count - skipped} asset(s), skipped {skipped} unchanged asset(s).");
             return 0;
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
@@ -129,6 +173,8 @@ public sealed class WebMinifierWriteRunner(
             return 1;
         }
     }
+
+    private static string Hash(string value) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(value)));
 
     private async ValueTask<List<string>> Scan(string folder, string projectDir, WebMinifierOptions options,
         HashSet<string> visited, CancellationToken cancellationToken)
@@ -174,7 +220,7 @@ public sealed class WebMinifierWriteRunner(
                 string excludedPath = Path.TrimEndingDirectorySeparator(Path.GetFullPath(excluded, projectDir));
                 if (_pathComparer.Equals(folder, excludedPath) || folder.StartsWith(
                         excludedPath + Path.DirectorySeparatorChar,
-                        OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
+                        RuntimeUtil.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
                     return true;
             }
         }
