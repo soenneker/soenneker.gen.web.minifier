@@ -16,14 +16,14 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.13" />
         <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.13" />
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.13" />
-        <PackageReference Include="Soenneker.Css.Minify" Version="4.0.159" />
+        <PackageReference Include="Soenneker.Css.Minify" Version="4.0.160" />
         <PackageReference Include="Soenneker.JavaScript.Minifier" Version="4.0.13" />
         <PackageReference Include="Soenneker.Extensions.Task" Version="4.0.139" />
         <PackageReference Include="Soenneker.Extensions.ValueTask" Version="4.0.132" />
-        <PackageReference Include="Soenneker.Utils.File" Version="4.0.2314" />
-        <PackageReference Include="Soenneker.Utils.Json" Version="4.0.2751" />
+        <PackageReference Include="Soenneker.Utils.File" Version="4.0.2315" />
+        <PackageReference Include="Soenneker.Utils.Json" Version="4.0.2752" />
         <PackageReference Include="Soenneker.Utils.Runtime" Version="4.0.1145" />
-        <PackageReference Include="Soenneker.Utils.Directory" Version="4.0.962" />
+        <PackageReference Include="Soenneker.Utils.Directory" Version="4.0.963" />
     </ItemGroup>
 </Project>
 
