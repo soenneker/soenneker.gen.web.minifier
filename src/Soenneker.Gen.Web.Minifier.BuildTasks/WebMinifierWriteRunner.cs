@@ -143,7 +143,7 @@ public sealed class WebMinifierWriteRunner(
                         ? await cssMinifier.Minify(source, cancellationToken).NoSync()
                         : await javaScriptMinifier.Minify(source, cancellationToken).NoSync();
                     if (existing != minified)
-                        await fileUtil.Write(output, minified, log: false, cancellationToken: cancellationToken)
+                        await fileUtil.WriteAtomically(output, minified, log: false, cancellationToken: cancellationToken)
                                       .NoSync();
                     updatedCache[input] = inputHash + Hash(minified);
                     outputs.Add(Path.GetRelativePath(projectDir, output));
@@ -155,7 +155,8 @@ public sealed class WebMinifierWriteRunner(
                 outputsPath = Path.GetFullPath(outputsPath, projectDir);
                 await directoryUtil.Create(Path.GetDirectoryName(outputsPath)!, log: false,
                     cancellationToken: cancellationToken).NoSync();
-                await fileUtil.WriteAllLines(outputsPath, outputs, log: false, cancellationToken: cancellationToken)
+                string outputManifest = string.Join(Environment.NewLine, outputs) + (outputs.Count > 0 ? Environment.NewLine : string.Empty);
+                await fileUtil.WriteAtomically(outputsPath, outputManifest, log: false, cancellationToken: cancellationToken)
                               .NoSync();
             }
 
