@@ -18,14 +18,14 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0-rc.3.26522.148" />
         <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="11.0.0-rc.3.26522.148" />
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="11.0.0-rc.3.26522.148" />
-        <PackageReference Include="Soenneker.Css.Minify" Version="11.0.189" />
-        <PackageReference Include="Soenneker.JavaScript.Minifier" Version="11.0.39" />
+        <PackageReference Include="Soenneker.Css.Minify" Version="11.0.191" />
+        <PackageReference Include="Soenneker.JavaScript.Minifier" Version="11.0.41" />
         <PackageReference Include="Soenneker.Extensions.Task" Version="11.0.141" />
         <PackageReference Include="Soenneker.Extensions.ValueTask" Version="4.0.133" />
-        <PackageReference Include="Soenneker.Utils.File" Version="11.0.2332" />
-        <PackageReference Include="Soenneker.Utils.Json" Version="11.0.2777" />
-        <PackageReference Include="Soenneker.Utils.Runtime" Version="11.0.1160" />
-        <PackageReference Include="Soenneker.Utils.Directory" Version="11.0.972" />
+        <PackageReference Include="Soenneker.Utils.File" Version="11.0.2333" />
+        <PackageReference Include="Soenneker.Utils.Json" Version="11.0.2778" />
+        <PackageReference Include="Soenneker.Utils.Runtime" Version="11.0.1161" />
+        <PackageReference Include="Soenneker.Utils.Directory" Version="11.0.973" />
     </ItemGroup>
 </Project>
 
