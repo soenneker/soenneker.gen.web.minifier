@@ -24,7 +24,7 @@
         <PackageReference Include="Soenneker.Extensions.ValueTask" Version="11.0.135" />
         <PackageReference Include="Soenneker.Utils.File" Version="11.0.2334" />
         <PackageReference Include="Soenneker.Utils.Json" Version="11.0.2780" />
-        <PackageReference Include="Soenneker.Utils.Runtime" Version="11.0.1163" />
+        <PackageReference Include="Soenneker.Utils.Runtime" Version="11.0.1164" />
         <PackageReference Include="Soenneker.Utils.Directory" Version="11.0.973" />
     </ItemGroup>
 </Project>
