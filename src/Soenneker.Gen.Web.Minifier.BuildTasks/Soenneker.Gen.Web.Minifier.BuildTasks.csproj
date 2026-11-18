@@ -22,9 +22,9 @@
         <PackageReference Include="Soenneker.JavaScript.Minifier" Version="11.0.67" />
         <PackageReference Include="Soenneker.Extensions.Task" Version="11.0.143" />
         <PackageReference Include="Soenneker.Extensions.ValueTask" Version="11.0.137" />
-        <PackageReference Include="Soenneker.Utils.File" Version="11.0.2345" />
-        <PackageReference Include="Soenneker.Utils.Json" Version="11.0.2791" />
-        <PackageReference Include="Soenneker.Utils.Runtime" Version="11.0.1171" />
+        <PackageReference Include="Soenneker.Utils.File" Version="11.0.2346" />
+        <PackageReference Include="Soenneker.Utils.Json" Version="11.0.2792" />
+        <PackageReference Include="Soenneker.Utils.Runtime" Version="11.0.1172" />
         <PackageReference Include="Soenneker.Utils.Directory" Version="11.0.982" />
     </ItemGroup>
 </Project>
