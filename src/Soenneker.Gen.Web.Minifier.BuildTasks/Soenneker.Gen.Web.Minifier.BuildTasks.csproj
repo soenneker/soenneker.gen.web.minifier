@@ -19,12 +19,12 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="11.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="11.0.0" />
         <PackageReference Include="Soenneker.Css.Minify" Version="11.0.209" />
-        <PackageReference Include="Soenneker.JavaScript.Minifier" Version="11.0.67" />
+        <PackageReference Include="Soenneker.JavaScript.Minifier" Version="11.0.69" />
         <PackageReference Include="Soenneker.Extensions.Task" Version="11.0.143" />
         <PackageReference Include="Soenneker.Extensions.ValueTask" Version="11.0.137" />
         <PackageReference Include="Soenneker.Utils.File" Version="11.0.2346" />
         <PackageReference Include="Soenneker.Utils.Json" Version="11.0.2792" />
-        <PackageReference Include="Soenneker.Utils.Runtime" Version="11.0.1172" />
+        <PackageReference Include="Soenneker.Utils.Runtime" Version="11.0.1173" />
         <PackageReference Include="Soenneker.Utils.Directory" Version="11.0.982" />
     </ItemGroup>
 </Project>
